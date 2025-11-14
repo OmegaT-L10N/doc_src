@@ -1,0 +1,73 @@
+name: Sync English manual from upstream
+
+on:
+  schedule:
+    # Every Saturday at 03:03 UTC
+    - cron: '3 3 * * 6'
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: Optional reason for manual run
+        required: false
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: sync-i18n-en
+  cancel-in-progress: false
+
+env:
+  UPSTREAM_REPO: omegat-org/omegat
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target repository
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Set up Git user
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "l10n-github-actions@noreply.omegat.org"
+
+      - name: Fetch upstream repository (shallow)
+        run: |
+          git clone --depth=1 https://github.com/${{ env.UPSTREAM_REPO }}.git _upstream
+
+      - name: Replace local English i18n with upstream version
+        run: |
+          set -e
+          # Remove the English tree
+          rm -rf en || true
+          # Copy from upstream
+          cp -r _upstream/src_docs/manual/en /
+
+      - name: Stage changes
+        run: |
+          git add en
+
+      - name: Check for differences
+        id: diff
+        run: |
+          if git diff --staged --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit changes
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          ts="$(date -u +'%Y-%m-%d')"
+          git commit -m "Sync manual(en) from upstream ${UPSTREAM_REPO} on ${ts}"
+
+      - name: Push to master
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git push origin HEAD:master
