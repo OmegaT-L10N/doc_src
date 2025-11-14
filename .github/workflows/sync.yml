@@ -46,7 +46,7 @@ jobs:
           # Remove the English tree
           rm -rf en || true
           # Copy from upstream
-          cp -r _upstream/src_docs/manual/en /
+          cp -r _upstream/src_docs/manual/en ./
 
       - name: Stage changes
         run: |
