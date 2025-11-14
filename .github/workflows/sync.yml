@@ -45,12 +45,19 @@ jobs:
           set -e
           # Remove the English tree
           rm -rf en || true
+          rm -rf greeting || true
+          rm -rf tips || true
+          # mkdir
+          mkdir -p greeting
+          mkdir -p tips
           # Copy from upstream
           cp -r _upstream/src_docs/manual/en ./
+          cp -r _upstream/src_docs/greeting/en/* ./greeting/
+          cp -r _upstream/tipoftheday/src/main/resources/tips/en/* ./tips/
 
       - name: Stage changes
         run: |
-          git add en
+          git add en greeting tips
 
       - name: Check for differences
         id: diff
