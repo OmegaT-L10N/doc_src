@@ -53,7 +53,7 @@ jobs:
           # Copy from upstream
           cp -r _upstream/src_docs/manual/en ./
           cp -r _upstream/src_docs/greeting/en/* ./greeting/
-          cp -r _upstream/tipoftheday/src/main/resources/tips/en/* ./tips/
+          cp -r _upstream/src_docs/tips/en/* ./tips/
 
       - name: Stage changes
         run: |
