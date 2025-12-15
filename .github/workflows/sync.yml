@@ -20,13 +20,17 @@ concurrency:
 
 env:
   UPSTREAM_REPO: omegat-org/omegat
+  DEFAULT_BRANCH: master
+  MAINTAINANCE_BRANCH: releases/6.0
+  MAINTAINANCE_TREE_DIR: omegat-releases-6.0
+  BRANCH_TARGET: manuals-6.0
 
 jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout target repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: master
           fetch-depth: 0
@@ -36,28 +40,33 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "l10n-github-actions@noreply.omegat.org"
 
-      - name: Fetch upstream repository (shallow)
+      - name: Fetch from upstream repository
         run: |
           git clone --depth=1 https://github.com/${{ env.UPSTREAM_REPO }}.git _upstream
+          curl -L -o _upstream/branch.tar.gz https://github.com/${{ env.UPSTREAM_REPO }}/archive/refs/heads/${{ env.MAINTAINANCE_BRANCH }}.tar.gz
+          cd _upstream
+          tar xf branch.tar.gz
 
-      - name: Replace local English i18n with upstream version
+      - name: Replace local English with upstream version
         run: |
           set -e
-          # Remove the English tree
           rm -rf en || true
           rm -rf greeting || true
           rm -rf tips || true
-          # mkdir
+          rm -rf ${{ env.BRANCH_TARGET }} || true
+          mkdir -p en
           mkdir -p greeting
           mkdir -p tips
-          # Copy from upstream
-          cp -r _upstream/src_docs/manual/en ./
+          mkdir -p ${{ env.BRANCH_TARGET }}
+          # Copy to "en" for backward compatibility
+          cp -r _upstream/src_docs/manual/en/* ./en/
           cp -r _upstream/src_docs/greeting/en/* ./greeting/
           cp -r _upstream/src_docs/tips/en/* ./tips/
+          cp -r _upstream/${{ env.MAINTAINANCE_TREE_DIR }}/doc_src/en/* ./${{ env.BRANCH_TARGET }}/
 
       - name: Stage changes
         run: |
-          git add en greeting tips
+          git add en greeting tips ${{ env.BRANCH_TARGET }}
 
       - name: Check for differences
         id: diff
