@@ -23,7 +23,7 @@ env:
   DEFAULT_BRANCH: master
   MAINTAINANCE_BRANCH: releases/6.0
   MAINTAINANCE_TREE_DIR: omegat-releases-6.0
-  BRANCH_TARGET: docs-6.0
+  BRANCH_TARGET: manuals-6.0
 
 jobs:
   sync:
