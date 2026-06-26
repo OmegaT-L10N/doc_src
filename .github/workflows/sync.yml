@@ -47,8 +47,10 @@ jobs:
         run: |
           git clone --depth=1 https://github.com/${{ env.UPSTREAM_REPO }}.git _upstream
           curl -L -o _upstream/branch.tar.gz https://github.com/${{ env.UPSTREAM_REPO }}/archive/refs/heads/${{ env.MAINTAINANCE_BRANCH }}.tar.gz
+          curl -L -o _upstream/oldbranch.tar.gz https://github.com/${{ env.UPSTREAM_REPO }}/archive/refs/heads/${{ env.OLD_MAINTAINANCE_BRANCH }}.tar.gz
           cd _upstream
           tar xf branch.tar.gz
+          tar xf oldbranch.tar.gz
 
       - name: Replace local English with upstream version
         run: |
