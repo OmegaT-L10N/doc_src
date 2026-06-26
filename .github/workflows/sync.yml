@@ -21,9 +21,12 @@ concurrency:
 env:
   UPSTREAM_REPO: omegat-org/omegat
   DEFAULT_BRANCH: master
-  MAINTAINANCE_BRANCH: releases/6.0
-  MAINTAINANCE_TREE_DIR: omegat-releases-6.0
-  BRANCH_TARGET: manuals-6.0
+  OLD_MAINTAINANCE_BRANCH: releases/6.0
+  OLD_MAINTAINANCE_TREE_DIR: omegat-releases-6.0
+  OLD_MAINTAINANCE_BRANCH_TARGET: manuals-6.0
+  MAINTAINANCE_BRANCH: releases/6.1
+  MAINTAINANCE_TREE_DIR: omegat-releases-6.1
+  MAINTAINANCE_BRANCH_TARGET: manual-6.1
 
 jobs:
   sync:
@@ -54,15 +57,17 @@ jobs:
           rm -rf greeting || true
           rm -rf tips || true
           rm -rf ${{ env.BRANCH_TARGET }} || true
-          mkdir -p en
+          mkdir -p manual
           mkdir -p greeting
           mkdir -p tips
-          mkdir -p ${{ env.BRANCH_TARGET }}
+          mkdir -p ${{ env.MAINTAINANCE_BRANCH_TARGET }}
+          mkdir -p ${{ env.OLD_MAINTAINANCE_BRANCH_TARGET }}
           # Copy to "en" for backward compatibility
-          cp -r _upstream/src_docs/manual/en/* ./en/
+          cp -r _upstream/src_docs/manual/en/* ./manual/
           cp -r _upstream/src_docs/greeting/en/* ./greeting/
           cp -r _upstream/src_docs/tips/en/* ./tips/
-          cp -r _upstream/${{ env.MAINTAINANCE_TREE_DIR }}/doc_src/en/* ./${{ env.BRANCH_TARGET }}/
+          cp -r _upstream/${{ env.MAINTAINANCE_TREE_DIR }}/src_docs/manual/en/* ./${{ env.MAINTAINANCE_BRANCH_TARGET }}/
+          cp -r _upstream/${{ env.OLD_MAINTAINANCE_TREE_DIR }}/doc_src/en/* ./${{ env.OLD_MAINTAINANCE_BRANCH_TARGET }}/
 
       - name: Stage changes
         run: |
