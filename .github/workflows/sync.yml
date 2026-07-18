@@ -64,11 +64,13 @@ jobs:
           mkdir -p tips
           mkdir -p ${{ env.MAINTAINANCE_BRANCH_TARGET }}
           mkdir -p ${{ env.OLD_MAINTAINANCE_BRANCH_TARGET }}
-          # Copy to "en" for backward compatibility
-          cp -r _upstream/src_docs/manual/en/* ./manual/
-          cp -r _upstream/src_docs/greeting/en/* ./greeting/
-          cp -r _upstream/src_docs/tips/en/* ./tips/
+          # Copy manual, greeting and tips from src/docs/* at master branch
+          cp -r _upstream/src/docs/manual/en/* ./manual/
+          cp -r _upstream/src/docs/greeting/en/* ./greeting/
+          cp -r _upstream/src/docs/tips/en/* ./tips/
+          # Copy manual from src_docs/ at releases/6.1 branch
           cp -r _upstream/${{ env.MAINTAINANCE_TREE_DIR }}/src_docs/manual/en/* ./${{ env.MAINTAINANCE_BRANCH_TARGET }}/
+          # Copy manual from doc_src/ at releases/6.0 branch 
           cp -r _upstream/${{ env.OLD_MAINTAINANCE_TREE_DIR }}/doc_src/en/* ./${{ env.OLD_MAINTAINANCE_BRANCH_TARGET }}/
 
       - name: Stage changes
