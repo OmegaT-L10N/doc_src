@@ -203,6 +203,19 @@
             </listitem>
          </varlistentry>
          <varlistentry>
+            <term>Whole words only</term>
+            <listitem>
+               <para>Search terms only match whole words: matches that are directly
+                  		  preceded or followed by a letter or digit are ignored. In a
+                  		  keyword search this applies to each keyword separately. Word
+                  		  characters are recognized in any script, not only in the Latin
+                  		  alphabet.</para>
+               <para>The option applies to exact and keyword searches. In a regular
+                  		  expression search you define word boundaries in the expression
+                  		  itself, so the option is disabled there.</para>
+            </listitem>
+         </varlistentry>
+         <varlistentry>
             <term>In source</term>
             <listitem>
                <para>Search in the source segments.</para>
@@ -223,8 +236,7 @@
          <varlistentry>
             <term>In properties</term>
             <listitem>
-               <para>Search in the properties attached to segments, including the
-                  		  segment's file, ID and path, as displayed in the
+               <para>Search in all the properties attached to segments, as displayed in the
                   <link linkend="panes.segment.properties" endterm="panes.segment.properties.title"></link> pane.</para>
             </listitem>
          </varlistentry>
