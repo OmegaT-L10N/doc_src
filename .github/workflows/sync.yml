@@ -19,14 +19,17 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  UPSTREAM_REPO: omegat-org/omegat
+  UPSTREAM_REPO_URL: https://dev.azure.com/omegat-org/OmegaT/_git/omegat
   DEFAULT_BRANCH: master
-  OLD_MAINTAINANCE_BRANCH: releases/6.0
-  OLD_MAINTAINANCE_TREE_DIR: omegat-releases-6.0
-  OLD_MAINTAINANCE_BRANCH_TARGET: manuals-6.0
-  MAINTAINANCE_BRANCH: releases/6.1
-  MAINTAINANCE_TREE_DIR: omegat-releases-6.1
-  MAINTAINANCE_BRANCH_TARGET: manual-6.1
+  DEFAULT_DOCS_DIR: src/docs
+  OLD_MAINTENANCE_BRANCH: releases/6.0
+  OLD_MAINTENANCE_DOCS_DIR: doc_src
+  OLD_MAINTENANCE_TREE_DIR: omegat-releases-6.0
+  OLD_MAINTENANCE_BRANCH_TARGET: manuals-6.0
+  MAINTENANCE_BRANCH: releases/6.1
+  MAINTENANCE_DOCS_DIR: src_docs
+  MAINTENANCE_TREE_DIR: omegat-releases-6.1
+  MAINTENANCE_BRANCH_TARGET: manual-6.1
 
 jobs:
   sync:
@@ -45,33 +48,29 @@ jobs:
 
       - name: Fetch from upstream repository
         run: |
-          git clone --depth=1 https://github.com/${{ env.UPSTREAM_REPO }}.git _upstream
-          curl -L -o _upstream/branch.tar.gz https://github.com/${{ env.UPSTREAM_REPO }}/archive/refs/heads/${{ env.MAINTAINANCE_BRANCH }}.tar.gz
-          curl -L -o _upstream/oldbranch.tar.gz https://github.com/${{ env.UPSTREAM_REPO }}/archive/refs/heads/${{ env.OLD_MAINTAINANCE_BRANCH }}.tar.gz
-          cd _upstream
-          tar xf branch.tar.gz
-          tar xf oldbranch.tar.gz
+          set -euo pipefail
+          fetch_docs() {   # branch, destination dir, paths...
+            local branch=$1 dir=$2; shift 2
+            git clone --depth=1 --filter=blob:none --sparse --branch "$branch" "$UPSTREAM_REPO_URL" "$dir"
+            git -C "$dir" sparse-checkout set "$@"
+          }
+          fetch_docs "$DEFAULT_BRANCH" _upstream "$DEFAULT_DOCS_DIR/manual/en" "$DEFAULT_DOCS_DIR/greeting/en" "$DEFAULT_DOCS_DIR/tips/en"
+          fetch_docs "$MAINTENANCE_BRANCH" "_upstream/$MAINTENANCE_TREE_DIR" "$MAINTENANCE_DOCS_DIR/manual/en"
+          fetch_docs "$OLD_MAINTENANCE_BRANCH" "_upstream/$OLD_MAINTENANCE_TREE_DIR" "$OLD_MAINTENANCE_DOCS_DIR/en"
 
       - name: Replace local English with upstream version
         run: |
-          set -e
-          rm -rf en || true
-          rm -rf greeting || true
-          rm -rf tips || true
-          rm -rf ${{ env.BRANCH_TARGET }} || true
-          mkdir -p manual
-          mkdir -p greeting
-          mkdir -p tips
-          mkdir -p ${{ env.MAINTAINANCE_BRANCH_TARGET }}
-          mkdir -p ${{ env.OLD_MAINTAINANCE_BRANCH_TARGET }}
+          set -euo pipefail
+          rm -rf manual greeting tips "$MAINTAINANCE_BRANCH_TARGET" "$OLD_MAINTAINANCE_BRANCH_TARGET"
+          mkdir -p manual greeting tips "$MAINTAINANCE_BRANCH_TARGET" "$OLD_MAINTAINANCE_BRANCH_TARGET"
           # Copy manual, greeting and tips from src/docs/* at master branch
-          cp -r _upstream/src/docs/manual/en/* ./manual/
-          cp -r _upstream/src/docs/greeting/en/* ./greeting/
-          cp -r _upstream/src/docs/tips/en/* ./tips/
-          # Copy manual from src_docs/ at releases/6.1 branch
-          cp -r _upstream/${{ env.MAINTAINANCE_TREE_DIR }}/src_docs/manual/en/* ./${{ env.MAINTAINANCE_BRANCH_TARGET }}/
-          # Copy manual from doc_src/ at releases/6.0 branch 
-          cp -r _upstream/${{ env.OLD_MAINTAINANCE_TREE_DIR }}/doc_src/en/* ./${{ env.OLD_MAINTAINANCE_BRANCH_TARGET }}/
+          cp -r "_upstream/$DEFAULT_DOCS_DIR/manual/en/"*   manual/
+          cp -r "_upstream/$DEFAULT_DOCS_DIR/greeting/en/"* greeting/
+          cp -r "_upstream/$DEFAULT_DOCS_DIR/tips/en/"*     tips/
+          # releases/6.1
+          cp -r "_upstream/$MAINTAINANCE_TREE_DIR/$MAINTAINANCE_DOCS_DIR/manual/en/"* "$MAINTAINANCE_BRANCH_TARGET/"
+          # releases/6.0
+          cp -r "_upstream/$OLD_MAINTAINANCE_TREE_DIR/$OLD_MAINTAINANCE_DOCS_DIR/en/"* "$OLD_MAINTAINANCE_BRANCH_TARGET/"
 
       - name: Stage changes
         run: |
