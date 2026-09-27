@@ -74,7 +74,7 @@ jobs:
 
       - name: Stage changes
         run: |
-          git add manual greeting tips ${{ env.OLD_MAINTAINANCE_BRANCH_TARGET }} ${{ env.MAINTAINANCE_BRANCH_TARGET }}
+          git add manual greeting tips "$OLD_MAINTENANCE_BRANCH_TARGET" "$MAINTENANCE_BRANCH_TARGET"
 
       - name: Check for differences
         id: diff
