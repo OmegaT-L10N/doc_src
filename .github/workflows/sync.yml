@@ -61,16 +61,16 @@ jobs:
       - name: Replace local English with upstream version
         run: |
           set -euo pipefail
-          rm -rf manual greeting tips "$MAINTAINANCE_BRANCH_TARGET" "$OLD_MAINTAINANCE_BRANCH_TARGET"
-          mkdir -p manual greeting tips "$MAINTAINANCE_BRANCH_TARGET" "$OLD_MAINTAINANCE_BRANCH_TARGET"
+          rm -rf manual greeting tips "$MAINTENANCE_BRANCH_TARGET" "$OLD_MAINTENANCE_BRANCH_TARGET"
+          mkdir -p manual greeting tips "$MAINTENANCE_BRANCH_TARGET" "$OLD_MAINTENANCE_BRANCH_TARGET"
           # Copy manual, greeting and tips from src/docs/* at master branch
           cp -r "_upstream/$DEFAULT_DOCS_DIR/manual/en/"*   manual/
           cp -r "_upstream/$DEFAULT_DOCS_DIR/greeting/en/"* greeting/
           cp -r "_upstream/$DEFAULT_DOCS_DIR/tips/en/"*     tips/
           # releases/6.1
-          cp -r "_upstream/$MAINTAINANCE_TREE_DIR/$MAINTAINANCE_DOCS_DIR/manual/en/"* "$MAINTAINANCE_BRANCH_TARGET/"
+          cp -r "_upstream/$MAINTENANCE_TREE_DIR/$MAINTENANCE_DOCS_DIR/manual/en/"* "$MAINTENANCE_BRANCH_TARGET/"
           # releases/6.0
-          cp -r "_upstream/$OLD_MAINTAINANCE_TREE_DIR/$OLD_MAINTAINANCE_DOCS_DIR/en/"* "$OLD_MAINTAINANCE_BRANCH_TARGET/"
+          cp -r "_upstream/$OLD_MAINTENANCE_TREE_DIR/$OLD_MAINTENANCE_DOCS_DIR/en/"* "$OLD_MAINTENANCE_BRANCH_TARGET/"
 
       - name: Stage changes
         run: |
