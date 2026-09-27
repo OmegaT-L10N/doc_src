@@ -19,7 +19,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  UPSTREAM_REPO_URL: https://github.com/omegat-org/omegat
+  UPSTREAM_REPO_URL: https://dev.azure.com/omegat-org/OmegaT/_git/omegat
   DEFAULT_BRANCH: master
   DEFAULT_DOCS_DIR: src/docs
   OLD_MAINTENANCE_BRANCH: releases/6.0
